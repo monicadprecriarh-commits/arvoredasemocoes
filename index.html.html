@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Árvore das Emoções | ICEIA</title>
+  <style>
+    :root {
+      --bg1: #fff8dc;
+      --bg2: #e8f8ff;
+      --green: #5fa85f;
+      --green-dark: #2f6b3f;
+      --brown: #8b5a2b;
+      --text: #29404a;
+      --card: rgba(255, 255, 255, 0.88);
+      --shadow: 0 12px 28px rgba(47, 93, 83, 0.18);
+      --radius: 26px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(255, 232, 166, .85), transparent 34%),
+        radial-gradient(circle at top right, rgba(187, 230, 255, .95), transparent 32%),
+        linear-gradient(160deg, var(--bg1), var(--bg2));
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.35);
+      filter: blur(2px);
+      z-index: -1;
+    }
+
+    body::before { top: 70px; left: -80px; }
+    body::after { bottom: 90px; right: -100px; }
+
+    header {
+      padding: 34px 18px 12px;
+      text-align: center;
+      position: relative;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .72);
+      box-shadow: var(--shadow);
+      font-weight: 700;
+      color: #3f6b4f;
+      margin-bottom: 12px;
+      font-size: .92rem;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 7vw, 4.1rem);
+      line-height: 1;
+      color: #2d7047;
+      letter-spacing: -1px;
+    }
+
+    .subtitle {
+      max-width: 850px;
+      margin: 14px auto 0;
+      font-size: clamp(1rem, 2.8vw, 1.18rem);
+      line-height: 1.55;
+    }
+
+    nav {
+      max-width: 1050px;
+      margin: 22px auto 0;
+      padding: 0 12px;
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      scrollbar-width: thin;
+    }
+
+    nav a {
+      flex: 0 0 auto;
+      text-decoration: none;
+      color: #24424a;
+      background: rgba(255,255,255,.78);
+      border: 1px solid rgba(47,107,63,.14);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      box-shadow: 0 6px 16px rgba(47, 93, 83, 0.08);
+      transition: transform .2s ease, background .2s ease;
+    }
+
+    nav a:hover { transform: translateY(-2px); background: #fff; }
+
+    main {
+      width: min(1120px, calc(100% - 24px));
+      margin: 0 auto 28px;
+    }
+
+    section {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.65);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: clamp(18px, 4vw, 30px);
+      margin: 22px 0;
+      backdrop-filter: blur(6px);
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      color: #2f6b3f;
+      font-size: clamp(1.45rem, 4.5vw, 2.2rem);
+    }
+
+    p { line-height: 1.6; }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(280px, 1.1fr) minmax(260px, .9fr);
+      gap: 22px;
+      align-items: center;
+    }
+
+    .tree-wrap {
+      min-height: 620px;
+      position: relative;
+      border-radius: 34px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 24%, rgba(132, 209, 107, .72), transparent 28%),
+        linear-gradient(#dbf6ff, #f8ffe8 62%, #d7f0bc 63%);
+      border: 1px solid rgba(47, 107, 63, .12);
+    }
+
+    .sun {
+      position: absolute;
+      right: 18px;
+      top: 18px;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: #ffd86b;
+      box-shadow: 0 0 30px rgba(255, 216, 107, .9);
+    }
+
+    .cloud {
+      position: absolute;
+      width: 94px;
+      height: 36px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.85);
+      top: 70px;
+      left: 32px;
+    }
+
+    .cloud::before, .cloud::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,.9);
+    }
+
+    .cloud::before { width: 42px; height: 42px; left: 12px; top: -20px; }
+    .cloud::after { width: 52px; height: 52px; right: 8px; top: -28px; }
+
+    .trunk {
+      position: absolute;
+      left: 50%;
+      bottom: 72px;
+      transform: translateX(-50%);
+      width: 112px;
+      height: 270px;
+      background: linear-gradient(90deg, #7a4721, #a66a35, #74431f);
+      border-radius: 60px 60px 22px 22px;
+      z-index: 2;
+    }
+
+    .trunk::before,
+    .trunk::after {
+      content: "";
+      position: absolute;
+      width: 140px;
+      height: 38px;
+      background: #8b552a;
+      border-radius: 999px;
+      top: 70px;
+      z-index: -1;
+    }
+
+    .trunk::before { left: -100px; transform: rotate(-36deg); }
+    .trunk::after { right: -100px; transform: rotate(36deg); }
+
+    .crown {
+      position: absolute;
+      left: 50%;
+      top: 70px;
+      transform: translateX(-50%);
+      width: min(92%, 520px);
+      height: 420px;
+      background:
+        radial-gradient(circle at 30% 32%, #9fe06e 0 24%, transparent 25%),
+        radial-gradient(circle at 67% 26%, #75c969 0 28%, transparent 29%),
+        radial-gradient(circle at 50% 55%, #65b95d 0 40%, transparent 41%),
+        radial-gradient(circle at 26% 63%, #72c863 0 27%, transparent 28%),
+        radial-gradient(circle at 75% 64%, #8ad66d 0 25%, transparent 26%);
+      filter: drop-shadow(0 12px 16px rgba(49,100,49,.18));
+      z-index: 3;
+    }
+
+    .emotion {
+      position: absolute;
+      z-index: 5;
+      width: 78px;
+      min-height: 78px;
+      border: 0;
+      border-radius: 22px 22px 24px 24px;
+      color: #233;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 10px 18px rgba(37,71,55,.2);
+      transition: transform .18s ease, filter .18s ease;
+      display: grid;
+      place-items: center;
+      padding: 7px;
+      text-align: center;
+      font-size: .72rem;
+      line-height: 1.05;
+    }
+
+    .emotion .face { display: block; font-size: 1.75rem; margin-bottom: 3px; }
+    .emotion:hover, .emotion:focus { transform: scale(1.08) rotate(-2deg); filter: brightness(1.04); outline: 3px solid rgba(255,255,255,.85); }
+
+    .emo-card {
+      background: rgba(255,255,255,.85);
+      border-radius: 24px;
+      padding: 20px;
+      border: 1px solid rgba(47,107,63,.14);
+      min-height: 300px;
+    }
+
+    .selected-face { font-size: 4rem; margin: 4px 0; }
+    .pill-title { display: inline-block; padding: 8px 13px; border-radius: 999px; font-weight: 900; margin-bottom: 10px; }
+
+    .grid-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .big-btn, .choice-btn, .reset-btn {
+      border: 0;
+      border-radius: 18px;
+      padding: 13px 14px;
+      min-height: 52px;
+      cursor: pointer;
+      font-weight: 800;
+      color: #243b42;
+      box-shadow: 0 7px 14px rgba(45, 74, 56, .12);
+      transition: transform .16s ease, filter .16s ease;
+    }
+
+    .big-btn:hover, .choice-btn:hover, .reset-btn:hover { transform: translateY(-2px); filter: brightness(1.03); }
+
+    .message-box {
+      margin-top: 14px;
+      padding: 16px;
+      border-radius: 20px;
+      background: #fff7d7;
+      border-left: 6px solid #ffc857;
+      font-weight: 700;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 150px;
+      border: 2px dashed #8ccf8a;
+      border-radius: 20px;
+      padding: 15px;
+      font-size: 1rem;
+      resize: vertical;
+      background: rgba(255,255,255,.92);
+      color: var(--text);
+    }
+
+    .draw-tools { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0; align-items: center; }
+    input[type="color"] { width: 54px; height: 42px; border: 0; background: transparent; cursor: pointer; }
+    input[type="range"] { accent-color: var(--green-dark); }
+
+    canvas {
+      width: 100%;
+      height: 280px;
+      background: white;
+      border: 2px dashed #a5cfe8;
+      border-radius: 20px;
+      touch-action: none;
+    }
+
+    .memory-board {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(62px, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .card {
+      aspect-ratio: 1 / 1;
+      border: 0;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #8bd3ff, #b8f3c1);
+      box-shadow: 0 8px 16px rgba(39,74,64,.12);
+      font-size: clamp(1.5rem, 7vw, 2.3rem);
+      cursor: pointer;
+      font-weight: 900;
+      transition: transform .2s ease;
+    }
+
+    .card.flipped, .card.matched { background: #fff; transform: rotateY(180deg); }
+    .card.matched { outline: 4px solid rgba(91, 180, 96, .55); cursor: default; }
+
+    .match-area, .triad-area {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 16px;
+    }
+
+    .drop-zone, .option-zone, .triad-card {
+      background: rgba(255,255,255,.78);
+      border-radius: 20px;
+      padding: 16px;
+      border: 1px solid rgba(47,107,63,.15);
+      min-height: 120px;
+    }
+
+    .face-option {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 70px;
+      height: 70px;
+      margin: 6px;
+      border: 0;
+      border-radius: 22px;
+      font-size: 2rem;
+      cursor: pointer;
+      background: #fff2a8;
+      box-shadow: 0 6px 12px rgba(47,80,61,.14);
+    }
+
+    .word-tag {
+      display: inline-block;
+      padding: 12px 16px;
+      border-radius: 999px;
+      font-weight: 900;
+      background: #e7f7ff;
+      margin: 6px;
+    }
+
+    select {
+      width: 100%;
+      margin: 8px 0 14px;
+      padding: 12px;
+      border-radius: 15px;
+      border: 1px solid #a8d3b0;
+      font-size: 1rem;
+      background: #fff;
+    }
+
+    .info-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      padding: 0;
+      margin: 18px 0 0;
+      list-style: none;
+    }
+
+    .info-list li {
+      background: rgba(255,255,255,.75);
+      padding: 16px;
+      border-radius: 18px;
+      border-left: 6px solid #91cf76;
+      line-height: 1.5;
+    }
+
+    footer {
+      text-align: center;
+      padding: 28px 16px 38px;
+      color: #31494f;
+      font-size: .95rem;
+    }
+
+    footer strong { display: block; margin-bottom: 8px; }
+
+    @media (max-width: 820px) {
+      .hero, .match-area, .triad-area { grid-template-columns: 1fr; }
+      .tree-wrap { min-height: 540px; }
+      .emotion { width: 66px; min-height: 66px; font-size: .62rem; border-radius: 18px; }
+      .emotion .face { font-size: 1.45rem; }
+      .trunk { width: 86px; height: 220px; bottom: 66px; }
+      .crown { height: 360px; top: 72px; width: 98%; }
+      .memory-board { grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    }
+
+    @media (max-width: 430px) {
+      main { width: min(100% - 14px, 1120px); }
+      section { padding: 16px; border-radius: 22px; }
+      nav { padding-left: 4px; }
+      .tree-wrap { min-height: 500px; }
+      .emotion { width: 58px; min-height: 58px; padding: 4px; font-size: .55rem; }
+      .emotion .face { font-size: 1.25rem; }
+      .memory-board { grid-template-columns: repeat(4, 1fr); }
+      canvas { height: 235px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="badge"></div>
+    <h1>Árvore das Emoções</h1>
+    <p class="subtitle">Um espaço interativo para reconhecer, nomear e compartilhar emoções. Nenhuma emoção é errada: todas comunicam algo sobre o que estamos vivendo.</p>
+    <nav aria-label="Menu principal">
+      <a href="#arvore">Árvore</a>
+      <a href="#sentindo">Como estou?</a>
+      <a href="#compartilhar">Compartilhar</a>
+      <a href="#memoria">Jogo da memória</a>
+      <a href="#expressao">Emoção e expressão</a>
+      <a href="#vida">Emoções na vida</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="arvore" class="hero">
+      <div class="tree-wrap" aria-label="Árvore interativa das emoções">
+        <div class="sun"></div>
+        <div class="cloud"></div>
+        <div class="crown"></div>
+        <div class="trunk"></div>
+        <div id="emotionButtons"></div>
+      </div>
+
+      <article class="emo-card" id="emotionInfo" aria-live="polite">
+        <span class="pill-title" style="background:#dff7c8;">Toque em uma emoção</span>
+        <div class="selected-face">🌳</div>
+        <h2>Conheça sua emoção</h2>
+        <p>Escolha uma carinha na árvore para ver uma explicação simples sobre o que essa emoção pode indicar, como ela aparece no corpo e como pode influenciar pensamentos, memórias e comportamentos.</p>
+      </article>
+    </section>
+
+    <section id="sentindo">
+      <h2>Como estou me sentindo hoje?</h2>
+      <p>Toque na emoção que mais representa seu dia. A escolha é sua e não existe resposta certa ou errada.</p>
+      <div class="grid-buttons" id="todayButtons"></div>
+      <div class="message-box" id="todayMessage">🌱 Sua resposta aparecerá aqui.</div>
+    </section>
+
+    <section id="compartilhar">
+      <h2>Quero compartilhar como estou me sentindo</h2>
+      <p><strong>Sua voz importa. Fale, escreva ou desenhe aqui.</strong></p>
+      <textarea placeholder="Escreva livremente como você está se sentindo hoje..."></textarea>
+      <div class="draw-tools">
+        <strong>Desenho:</strong>
+        <label>Cor <input type="color" id="colorPicker" value="#2f6b3f" /></label>
+        <label>Tamanho <input type="range" id="brushSize" min="2" max="28" value="8" /></label>
+        <button class="reset-btn" onclick="useEraser()">Borracha</button>
+        <button class="reset-btn" onclick="clearCanvas()">Limpar desenho</button>
+      </div>
+      <canvas id="drawingCanvas" width="900" height="330" aria-label="Quadro branco para desenho"></canvas>
+    </section>
+
+    <section id="memoria">
+      <h2>Jogo da memória das emoções</h2>
+      <p>Encontre os pares de carinhas iguais. Observe as expressões e as cores.</p>
+      <button class="reset-btn" onclick="startMemoryGame()">Reiniciar jogo</button>
+      <div class="message-box" id="memoryStatus">Vamos jogar?</div>
+      <div class="memory-board" id="memoryBoard"></div>
+    </section>
+
+    <section id="expressao">
+      <h2>Jogo: emoção e expressão</h2>
+      <p>Leia o nome da emoção e toque na carinha que combina com ela.</p>
+      <div class="match-area">
+        <div class="drop-zone">
+          <p>Emoção da rodada:</p>
+          <div class="word-tag" id="matchWord">Alegria</div>
+          <div class="message-box" id="matchFeedback">Escolha uma expressão.</div>
+          <button class="reset-btn" onclick="newExpressionRound()">Nova rodada</button>
+        </div>
+        <div class="option-zone" id="faceOptions"></div>
+      </div>
+    </section>
+
+    <section id="pensamento">
+      <h2>Jogo: emoção, pensamento e comportamento</h2>
+      <p>Relacione a emoção ao pensamento e ao comportamento que podem aparecer junto com ela.</p>
+      <div class="triad-area">
+        <div class="triad-card">
+          <h3 id="triadEmotion">Emoção: medo</h3>
+          <label for="thoughtSelect"><strong>Pensamento possível:</strong></label>
+          <select id="thoughtSelect"></select>
+          <label for="behaviorSelect"><strong>Comportamento possível:</strong></label>
+          <select id="behaviorSelect"></select>
+          <button class="reset-btn" onclick="checkTriad()">Verificar</button>
+          <button class="reset-btn" onclick="newTriadRound()">Nova emoção</button>
+        </div>
+        <div class="triad-card">
+          <h3>Resultado</h3>
+          <div class="message-box" id="triadFeedback">Faça suas escolhas.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="vida">
+      <h2>Como as emoções influenciam nossa vida?</h2>
+      <p>As emoções ajudam o corpo e a mente a reagirem ao que acontece ao nosso redor. Elas podem aparecer de forma intensa ou leve, rápida ou duradoura. O importante é aprender a perceber o que sentimos e buscar formas cuidadosas de lidar com isso.</p>
+      <ul class="info-list">
+        <li><strong>Interpretação:</strong> uma emoção pode mudar a forma como entendemos uma situação.</li>
+        <li><strong>Memórias:</strong> momentos com emoção forte costumam ficar mais marcados.</li>
+        <li><strong>Decisões:</strong> aquilo que sentimos pode influenciar escolhas e prioridades.</li>
+        <li><strong>Comportamentos:</strong> emoções podem nos aproximar, afastar, proteger ou pedir pausa.</li>
+        <li><strong>Relações:</strong> reconhecer emoções ajuda a conversar melhor e respeitar o outro.</li>
+      </ul>
+      <p><strong>Nenhuma emoção é “errada” ou “ruim”.</strong> Todas têm uma função e podem nos ajudar a compreender melhor o que estamos vivendo.</p>
+    </section>
+  </main>
+
+  <footer>
+    <strong>Produto final de devolutiva — Estágio Básico Supervisionado I | Psicologia | Orientador Caio Matos | Faculdade Santa Casa | Colégio ICEIA — Instituto Central de Educação Isaías Alves.</strong>
+    <span>Discentes: Ana Carolina Moscoso, Claudemir Silva, Joyce Barreto, Juliane Costa, Lilian Senna, Monica Oliveira e Vicente Costa.</span>
+  </footer>
+
+  <script>
+    const emotions = [
+      { name: 'Alegria', face: '😊', color: '#ffd95a', pos: [47, 16], text: 'A alegria pode indicar satisfação, vínculo ou conquista. No corpo, aparece como leveza, sorriso e energia. Ela pode tornar pensamentos mais otimistas, fortalecer memórias boas e aproximar pessoas.' },
+      { name: 'Tristeza', face: '😢', color: '#9ed0ff', pos: [28, 25], text: 'A tristeza pode indicar perda, saudade ou necessidade de acolhimento. No corpo, pode aparecer como cansaço, choro ou aperto no peito. Ela pode deixar pensamentos mais lentos e memórias mais sensíveis.' },
+      { name: 'Raiva', face: '😠', color: '#ff8b7b', pos: [66, 24], text: 'A raiva pode indicar limite ultrapassado ou sensação de injustiça. No corpo, pode aparecer como calor, tensão e coração acelerado. Ela pode impulsionar defesa, fala firme ou necessidade de pausa.' },
+      { name: 'Medo', face: '😨', color: '#c6b6ff', pos: [18, 40], text: 'O medo pode indicar perigo real ou imaginado. No corpo, pode surgir tremor, frio na barriga e atenção aumentada. Ele pode trazer pensamentos de ameaça e comportamentos de proteção ou evitação.' },
+      { name: 'Nojo', face: '🤢', color: '#a9e57e', pos: [76, 40], text: 'O nojo pode indicar rejeição a algo percebido como desagradável ou inadequado. No corpo, pode aparecer como enjoo ou vontade de afastamento. Ele influencia escolhas e limites.' },
+      { name: 'Ansiedade', face: '😟', color: '#ffc38a', pos: [39, 35], text: 'A ansiedade pode indicar antecipação ou preocupação com o futuro. No corpo, pode aparecer como agitação, respiração curta ou coração acelerado. Ela pode gerar pensamentos repetitivos e busca por controle.' },
+      { name: 'Vergonha', face: '😳', color: '#ffb7c5', pos: [58, 36], text: 'A vergonha pode aparecer quando sentimos exposição ou medo de julgamento. No corpo, pode surgir calor no rosto ou vontade de sumir. Ela pode influenciar a fala, a postura e a participação social.' },
+      { name: 'Inveja', face: '😒', color: '#b7e08f', pos: [28, 52], text: 'A inveja pode mostrar desejo por algo que outra pessoa tem. Ela pode causar comparação e desconforto. Quando compreendida, pode ajudar a reconhecer desejos, metas e necessidades próprias.' },
+      { name: 'Tédio', face: '🥱', color: '#d8d8d8', pos: [70, 53], text: 'O tédio pode indicar falta de estímulo, cansaço ou necessidade de novidade. No corpo, pode aparecer como sonolência e desânimo. Ele pode afetar atenção, interesse e participação.' },
+      { name: 'Nostalgia', face: '🥹', color: '#d9b7ff', pos: [45, 52], text: 'A nostalgia mistura saudade e carinho por lembranças. Pode aquecer o peito ou trazer vontade de reviver momentos. Ela mostra como memórias e emoções caminham juntas.' },
+      { name: 'Surpresa', face: '😮', color: '#9ff3f2', pos: [14, 58], text: 'A surpresa aparece diante do inesperado. No corpo, pode abrir os olhos, pausar a fala e aumentar a atenção. Ela prepara a mente para entender algo novo rapidamente.' },
+      { name: 'Calma', face: '😌', color: '#bff0d2', pos: [80, 61], text: 'A calma pode indicar segurança, pausa e equilíbrio. No corpo, pode aparecer como respiração tranquila e relaxamento. Ela ajuda a pensar com clareza e tomar decisões com cuidado.' },
+      { name: 'Culpa', face: '😔', color: '#b6c2cf', pos: [33, 68], text: 'A culpa pode surgir quando acreditamos que fizemos algo inadequado. Pode pesar no peito e gerar vontade de reparar. Ela pode ajudar na responsabilidade, desde que não vire punição constante.' },
+      { name: 'Frustração', face: '😤', color: '#ffb08f', pos: [59, 68], text: 'A frustração aparece quando algo não sai como esperado. No corpo, pode vir como tensão, irritação ou vontade de desistir. Ela pode ensinar sobre limites, tentativa e adaptação.' },
+      { name: 'Esperança', face: '🌟', color: '#fff09a', pos: [20, 72], text: 'A esperança aponta para possibilidades. No corpo, pode trazer ânimo e energia para continuar. Ela influencia pensamentos de futuro e comportamentos de busca por apoio e solução.' },
+      { name: 'Amor', face: '💗', color: '#ff9ec9', pos: [73, 74], text: 'O amor envolve vínculo, cuidado e pertencimento. No corpo, pode aparecer como aconchego e vontade de aproximação. Ele marca memórias afetivas e fortalece relações.' }
+    ];
+
+    const emotionButtons = document.getElementById('emotionButtons');
+    const emotionInfo = document.getElementById('emotionInfo');
+
+    emotions.forEach(e => {
+      const btn = document.createElement('button');
+      btn.className = 'emotion';
+      btn.style.background = e.color;
+      btn.style.left = e.pos[0] + '%';
+      btn.style.top = e.pos[1] + '%';
+      btn.style.transform = 'translate(-50%, -50%)';
+      btn.innerHTML = `<span class="face">${e.face}</span>${e.name}`;
+      btn.setAttribute('aria-label', `Emoção ${e.name}`);
+      btn.addEventListener('click', () => showEmotion(e));
+      emotionButtons.appendChild(btn);
+    });
+
+    function showEmotion(e) {
+      emotionInfo.innerHTML = `
+        <span class="pill-title" style="background:${e.color};">${e.name}</span>
+        <div class="selected-face">${e.face}</div>
+        <h2>${e.name}</h2>
+        <p>${e.text}</p>
+        <div class="message-box">Tudo bem sentir ${e.name.toLowerCase()}. Toda emoção tem algo a nos comunicar.</div>
+      `;
+    }
+
+    const todayButtons = document.getElementById('todayButtons');
+    emotions.forEach(e => {
+      const b = document.createElement('button');
+      b.className = 'big-btn';
+      b.style.background = e.color;
+      b.innerHTML = `${e.face} ${e.name}`;
+      b.onclick = () => {
+        document.getElementById('todayMessage').innerHTML = `${e.face} Você escolheu <strong>${e.name}</strong>. Tudo bem se sentir assim. Toda emoção tem algo a nos comunicar. Respire, observe o que essa emoção quer mostrar e procure apoio se precisar.`;
+      };
+      todayButtons.appendChild(b);
+    });
+
+    // Desenho
+    const canvas = document.getElementById('drawingCanvas');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+    let eraser = false;
+
+    function getPos(evt) {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+      const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+      return {
+        x: (clientX - rect.left) * (canvas.width / rect.width),
+        y: (clientY - rect.top) * (canvas.height / rect.height)
+      };
+    }
+
+    function startDraw(evt) {
+      drawing = true;
+      const p = getPos(evt);
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      evt.preventDefault();
+    }
+
+    function draw(evt) {
+      if (!drawing) return;
+      const p = getPos(evt);
+      ctx.lineWidth = document.getElementById('brushSize').value;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = eraser ? '#ffffff' : document.getElementById('colorPicker').value;
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+      evt.preventDefault();
+    }
+
+    function endDraw() { drawing = false; }
+    function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+    function useEraser() { eraser = true; setTimeout(() => eraser = false, 6000); }
+
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', endDraw);
+    canvas.addEventListener('mouseleave', endDraw);
+    canvas.addEventListener('touchstart', startDraw, { passive: false });
+    canvas.addEventListener('touchmove', draw, { passive: false });
+    canvas.addEventListener('touchend', endDraw);
+
+    // Jogo da memória
+    const memoryItems = emotions.slice(0, 8);
+    let firstCard = null;
+    let secondCard = null;
+    let lockBoard = false;
+    let matches = 0;
+
+    function startMemoryGame() {
+      const board = document.getElementById('memoryBoard');
+      board.innerHTML = '';
+      firstCard = null; secondCard = null; lockBoard = false; matches = 0;
+      document.getElementById('memoryStatus').textContent = 'Encontre os pares.';
+      const deck = [...memoryItems, ...memoryItems]
+        .map((item, index) => ({ ...item, id: index }))
+        .sort(() => Math.random() - 0.5);
+
+      deck.forEach(card => {
+        const btn = document.createElement('button');
+        btn.className = 'card';
+        btn.dataset.name = card.name;
+        btn.dataset.face = card.face;
+        btn.textContent = '🌿';
+        btn.onclick = () => flipCard(btn);
+        board.appendChild(btn);
+      });
+    }
+
+    function flipCard(card) {
+      if (lockBoard || card.classList.contains('matched') || card === firstCard) return;
+      card.classList.add('flipped');
+      card.textContent = card.dataset.face;
+      if (!firstCard) { firstCard = card; return; }
+      secondCard = card;
+      lockBoard = true;
+      if (firstCard.dataset.name === secondCard.dataset.name) {
+        firstCard.classList.add('matched');
+        secondCard.classList.add('matched');
+        matches++;
+        document.getElementById('memoryStatus').textContent = `Par encontrado: ${firstCard.dataset.name}!`;
+        resetFlipState();
+        if (matches === memoryItems.length) document.getElementById('memoryStatus').textContent = 'Parabéns! Você encontrou todas as emoções.';
+      } else {
+        setTimeout(() => {
+          firstCard.classList.remove('flipped');
+          secondCard.classList.remove('flipped');
+          firstCard.textContent = '🌿';
+          secondCard.textContent = '🌿';
+          resetFlipState();
+        }, 800);
+      }
+    }
+
+    function resetFlipState() { firstCard = null; secondCard = null; lockBoard = false; }
+
+    // Emoção e expressão
+    let currentMatch;
+    function newExpressionRound() {
+      currentMatch = emotions[Math.floor(Math.random() * emotions.length)];
+      document.getElementById('matchWord').textContent = currentMatch.name;
+      document.getElementById('matchFeedback').textContent = 'Escolha uma expressão.';
+      const options = [currentMatch];
+      while (options.length < 4) {
+        const random = emotions[Math.floor(Math.random() * emotions.length)];
+        if (!options.some(o => o.name === random.name)) options.push(random);
+      }
+      options.sort(() => Math.random() - 0.5);
+      const box = document.getElementById('faceOptions');
+      box.innerHTML = '';
+      options.forEach(o => {
+        const b = document.createElement('button');
+        b.className = 'face-option';
+        b.style.background = o.color;
+        b.textContent = o.face;
+        b.onclick = () => {
+          document.getElementById('matchFeedback').innerHTML = o.name === currentMatch.name
+            ? `Muito bem! Essa expressão combina com <strong>${currentMatch.name}</strong>.`
+            : `Quase! Essa carinha representa mais <strong>${o.name}</strong>. Tente observar a expressão da emoção pedida.`;
+        };
+        box.appendChild(b);
+      });
+    }
+
+    // Emoção, pensamento e comportamento
+    const triads = [
+      { emotion: 'Medo', thought: 'Algo ruim pode acontecer.', behavior: 'Evitar uma situação ou pedir ajuda.' },
+      { emotion: 'Alegria', thought: 'Isso foi bom para mim.', behavior: 'Compartilhar, sorrir ou querer repetir a experiência.' },
+      { emotion: 'Raiva', thought: 'Isso passou do meu limite.', behavior: 'Falar com firmeza, se afastar ou respirar antes de agir.' },
+      { emotion: 'Tristeza', thought: 'Sinto falta de algo ou alguém.', behavior: 'Chorar, buscar acolhimento ou ficar mais quieto.' },
+      { emotion: 'Ansiedade', thought: 'E se algo der errado?', behavior: 'Tentar controlar tudo, ficar inquieto ou pedir orientação.' },
+      { emotion: 'Calma', thought: 'Posso lidar com isso com cuidado.', behavior: 'Respirar melhor, pensar antes de agir e conversar.' }
+    ];
+    let currentTriad;
+
+    function newTriadRound() {
+      currentTriad = triads[Math.floor(Math.random() * triads.length)];
+      document.getElementById('triadEmotion').textContent = `Emoção: ${currentTriad.emotion}`;
+      const thoughtSelect = document.getElementById('thoughtSelect');
+      const behaviorSelect = document.getElementById('behaviorSelect');
+      thoughtSelect.innerHTML = '';
+      behaviorSelect.innerHTML = '';
+      triads.map(t => t.thought).sort(() => Math.random() - 0.5).forEach(t => {
+        thoughtSelect.innerHTML += `<option value="${t}">${t}</option>`;
+      });
+      triads.map(t => t.behavior).sort(() => Math.random() - 0.5).forEach(b => {
+        behaviorSelect.innerHTML += `<option value="${b}">${b}</option>`;
+      });
+      document.getElementById('triadFeedback').textContent = 'Faça suas escolhas.';
+    }
+
+    function checkTriad() {
+      const thought = document.getElementById('thoughtSelect').value;
+      const behavior = document.getElementById('behaviorSelect').value;
+      const ok = thought === currentTriad.thought && behavior === currentTriad.behavior;
+      document.getElementById('triadFeedback').innerHTML = ok
+        ? `Você relacionou bem! A emoção <strong>${currentTriad.emotion}</strong> pode influenciar pensamentos e comportamentos desse jeito.`
+        : `Tente novamente. Pense no que costuma aparecer quando sentimos <strong>${currentTriad.emotion}</strong>.`;
+    }
+
+    startMemoryGame();
+    newExpressionRound();
+    newTriadRound();
+  </script>
+</body>
+</html>
